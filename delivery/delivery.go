@@ -42,7 +42,7 @@ func (d *Delivery) Deliver(ctx context.Context) {
 	go d.deliver(ctx)
 }
 
-// deliver is intended to be ran as a go routine.
+// deliver is intended to be run as a go routine.
 //
 // implements a blocking event loop via a time.Ticker
 func (d *Delivery) deliver(ctx context.Context) error {
