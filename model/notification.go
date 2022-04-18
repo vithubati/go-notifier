@@ -1,6 +1,10 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 )
 
@@ -23,8 +27,34 @@ type Deliverer struct {
 	CreatedAt   time.Time           `json:"createdAt"`
 	Retry       int                 `json:"retry"`
 	Interval    int                 `json:"interval"`
-	Headers     map[string][]string `json:"headers"`
+	Headers     Headers             `json:"headers"`
 	Resources   []DelivererResource `json:"resources"`
+}
+
+type Headers map[string][]string
+
+// Scan scans value into Jsonb, implements sql.Scanner interface
+func (h *Headers) Scan(value interface{}) error {
+	byt, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+	var hdrs map[string][]string
+	err := json.Unmarshal(byt, &hdrs)
+	if err != nil {
+		return err
+	}
+	*h = hdrs
+	return nil
+}
+
+// Value return json value, implement driver.Valuer interface
+func (h Headers) Value() (driver.Value, error) {
+	raw, err := json.Marshal(h)
+	if err != nil {
+		return nil, err
+	}
+	return driver.Value(raw), nil
 }
 
 type DelivererResource struct {
