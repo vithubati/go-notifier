@@ -127,6 +127,7 @@ func webhookDeliveries(ctx context.Context, opts Opts, store store.Store) error 
 		ds = append(ds, delivry)
 	}
 	for _, d := range ds {
+		// fixme create new context so the deliverer can be canceled when required
 		d.Deliver(ctx)
 	}
 	return nil

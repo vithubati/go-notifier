@@ -16,7 +16,7 @@ import (
 // these operations occur under a transaction to preserve an atomic operation.
 func createNotification(ctx context.Context, db *sql.DB, n model.Notification) error {
 	const (
-		insertNotification = `INSERT INTO notification (id, action, createdAt, data) VALUES (?, ?, CURRENT_TIMESTAMP, ?);`
+		insertNotification = `INSERT INTO notification (id, action, resource, subject, message, createdAt, data) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?);`
 		insertDelivery     = `INSERT INTO delivery (id, notificationId, delivererId, status, createdAt, updatedAt) VALUES (?, ?, ?, 'CREATED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
 	)
 	deliverers, err := getDelivererIDsByResource(ctx, db, n.Resource)
@@ -32,7 +32,7 @@ func createNotification(ctx context.Context, db *sql.DB, n model.Notification) e
 	defer tx.Rollback()
 
 	// insert into Notification table
-	rslt, err := tx.ExecContext(ctx, insertNotification, uuid.New().String(), n.Action, n.Data)
+	rslt, err := tx.ExecContext(ctx, insertNotification, n.ID, n.Action, n.Resource, n.Subject, n.Message, n.Data)
 	if err != nil {
 		return err
 	}

@@ -13,6 +13,9 @@ import (
 	"net/url"
 )
 
+// Compile-time check to ensure Webhook implements delivery.Deliverer.
+var _ delivery.Deliverer = (*Webhook)(nil)
+
 type Webhook struct {
 	// a client to use for sending webhooks
 	client  *http.Client

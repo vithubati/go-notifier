@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+const data = `"{\n  \"type\": \"VPC\",\n  \"id\": \"1\",\n  \"attributes\": {\n    \"Name\": \"ProdVPC\",\n    \"region\": \"Canadacentral\",\n    \"cidr\": \"10.0.0.0/16\"\n  },\n  \"subnets\": [\n    {\n      \"subnet\": {\n        \"cidr\": \"10.0.1.0/24\"\n      }\n    }\n  ]\n}"`
+
 func Test_createNotification(t *testing.T) {
 	db, err := initDBConn()
 	defer db.Close()
@@ -15,6 +17,9 @@ func Test_createNotification(t *testing.T) {
 	n := model.Notification{
 		Resource: "VPC",
 		Action:   "UPDATED",
+		Subject:  "VPC Updated",
+		Message:  "Vpc is updated for the accountId 3290",
+		Data:     data,
 	}
 	err = createNotification(ctx, db, n)
 	assert.Nil(t, err)

@@ -14,6 +14,8 @@ type Notification struct {
 	ID                     string      `json:"id"`
 	Resource               string      `json:"resource"`
 	Action                 string      `json:"action"`
+	Subject                string      `json:"subject"`
+	Message                string      `json:"message"`
 	CreatedAt              time.Time   `json:"createdAt"`
 	Data                   interface{} `json:"data"`
 	NotificationDeliveryID string      `json:"-"`
