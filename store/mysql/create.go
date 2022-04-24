@@ -83,7 +83,7 @@ VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
 
 	// insert into Notification table
 	d.ID = uuid.NewString()
-	rslt, err := tx.ExecContext(ctx, insertDeliverer, uuid.New().String(), d.Type, d.Url, d.Headers, d.Credentials, d.Retry, d.Interval)
+	rslt, err := tx.ExecContext(ctx, insertDeliverer, uuid.New().String(), d.Type, d.Url, d.Headers, d.Credentials, d.Retry, d.IntervalInSeconds)
 	if err != nil {
 		return err
 	}

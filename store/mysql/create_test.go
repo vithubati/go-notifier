@@ -26,11 +26,11 @@ func Test_createDeliverer(t *testing.T) {
 	assert.Nil(t, err)
 	ctx := context.Background()
 	d := model.Deliverer{
-		Type:      "WEBHOOK",
-		Url:       "https://www.stackoverflow.com/ttest",
-		Retry:     3,
-		Interval:  10,
-		Resources: []model.DelivererResource{{Resource: "SERVER"}},
+		Type:              "WEBHOOK",
+		Url:               "https://www.stackoverflow.com/ttest",
+		Retry:             3,
+		IntervalInSeconds: 10,
+		Resources:         []model.DelivererResource{{Resource: "SERVER"}},
 	}
 	headers := make(map[string][]string)
 	headers["X-Request-id"] = []string{"456456"}

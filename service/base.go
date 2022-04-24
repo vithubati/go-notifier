@@ -57,8 +57,11 @@ func New(opts Opts) (*service, error) {
 	}, nil
 }
 
-func (s *service) GetDeliverer(ctx context.Context, dType string) ([]model.Deliverer, error) {
-	return s.store.GetDeliverer(ctx, dType)
+func (s *service) CreateDeliverer(ctx context.Context, d model.Deliverer) error {
+	if d.IntervalInSeconds <= 0 {
+		d.IntervalInSeconds = int(s.opts.DeliveryInterval.Seconds())
+	}
+	return s.store.CreateDeliverer(ctx, d)
 }
 
 func (s *service) CreateNotification(ctx context.Context, n model.Notification) error {
@@ -112,7 +115,7 @@ func webhookDeliveries(ctx context.Context, opts Opts, store store.Store) error 
 	ds := make([]*delivery.Delivery, 0, len(deliverers))
 	for _, d := range deliverers {
 		conf := &webhook.Config{
-			Headers: d.Headers,
+			Headers: http.Header(d.Headers),
 			Client:  opts.Client,
 			Target:  d.Url,
 		}
@@ -120,7 +123,7 @@ func webhookDeliveries(ctx context.Context, opts Opts, store store.Store) error 
 		if err != nil {
 			return fmt.Errorf("failed to create webhook deliverer: %v", err)
 		}
-		delivry := delivery.NewDelivery(d.ID, wh, opts.DeliveryInterval, store)
+		delivry := delivery.NewDelivery(d.ID, wh, time.Duration(d.IntervalInSeconds)*time.Second, store)
 		ds = append(ds, delivry)
 	}
 	for _, d := range ds {

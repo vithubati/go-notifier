@@ -21,6 +21,9 @@ type Delivery struct {
 }
 
 func NewDelivery(delivererID string, d Deliverer, interval time.Duration, store store.Store) *Delivery {
+	if interval.Seconds() == 0 {
+		interval = 5 * time.Second
+	}
 	return &Delivery{
 		DelivererID: delivererID,
 		Deliverer:   d,
@@ -39,7 +42,12 @@ func (d *Delivery) Deliver(ctx context.Context) {
 	}).WithContext(ctx)
 
 	ctxLog.Info("delivering notifications")
-	go d.deliver(ctx)
+	go func() {
+		err := d.deliver(ctx)
+		if err != nil {
+			ctxLog.Errorf("Error delivering notifications %+v", err)
+		}
+	}()
 }
 
 // deliver is intended to be run as a go routine.
@@ -62,7 +70,7 @@ func (d *Delivery) deliver(ctx context.Context) error {
 			err := d.runDelivery(ctx)
 			if err != nil {
 				ctxLog.WithContext(ctx).
-					WithError(err).Error("encountered error on tick")
+					WithError(err).Error("encountered error inside runDelivery")
 			}
 		}
 	}

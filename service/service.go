@@ -13,6 +13,11 @@ type Service interface {
 	// worker to tell the deliverer to kick off the delivery
 	CreateNotification(ctx context.Context, n model.Notification) error
 
+	// CreateDeliverer creates a new Deliverer in the DB
+	//
+	// Deliverer delivers notification deliveries which are in CREATED status
+	CreateDeliverer(ctx context.Context, n model.Deliverer) error
+
 	// KickOff initiates the Notifier worker.
 	//
 	// Worker starts all the enabled deliverer's delivery.

@@ -5,7 +5,7 @@ const (
 	CREATE TABLE IF NOT EXISTS notification
 	(
 		id 				varchar(36) PRIMARY KEY,
-		resource        VARCHAR(50) default NULL,
+		resource        VARCHAR(50) NOT NULL,
 		action          VARCHAR(50) NOT NULL,
 		createdAt       DATETIME,
 		data            TEXT

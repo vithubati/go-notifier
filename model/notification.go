@@ -20,21 +20,24 @@ type Notification struct {
 }
 
 type Deliverer struct {
-	ID          string              `json:"id"`
-	Type        string              `json:"type"`
-	Url         string              `json:"url"`
-	Credentials string              `json:"credentials"`
-	CreatedAt   time.Time           `json:"createdAt"`
-	Retry       int                 `json:"retry"`
-	Interval    int                 `json:"interval"`
-	Headers     Headers             `json:"headers"`
-	Resources   []DelivererResource `json:"resources"`
+	ID                string              `json:"id"`
+	Type              string              `json:"type"`
+	Url               string              `json:"url"`
+	Credentials       string              `json:"credentials"`
+	CreatedAt         time.Time           `json:"createdAt"`
+	Retry             int                 `json:"retry"`
+	IntervalInSeconds int                 `json:"IntervalInSeconds"`
+	Headers           Headers             `json:"headers"`
+	Resources         []DelivererResource `json:"resources"`
 }
 
 type Headers map[string][]string
 
-// Scan scans value into Jsonb, implements sql.Scanner interface
+// Scan scans value into Json, implements sql.Scanner interface
 func (h *Headers) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
 	byt, ok := value.([]byte)
 	if !ok {
 		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))

@@ -7,6 +7,10 @@ import (
 	"fmt"
 )
 
+var (
+	NoRowsEffectedDelivery = fmt.Errorf("no rows affected when updating delivery")
+)
+
 // delivered will update the delivery's status to "DELIVERED" for the provided
 // delivery id
 func delivered(ctx context.Context, db *sql.DB, id string) error {
@@ -23,7 +27,7 @@ func delivered(ctx context.Context, db *sql.DB, id string) error {
 		return errors.New(fmt.Sprintf("updating delivery state, %s", err.Error()))
 	}
 	if r <= 0 {
-		return fmt.Errorf("no rows affected when updating delivery")
+		return NoRowsEffectedDelivery
 	}
 
 	return nil
@@ -45,7 +49,7 @@ func failed(ctx context.Context, db *sql.DB, id string) error {
 		return errors.New(fmt.Sprintf("updating delivery state, %s", err.Error()))
 	}
 	if r <= 0 {
-		return fmt.Errorf("no rows affected when updating delivery")
+		return NoRowsEffectedDelivery
 	}
 
 	return nil

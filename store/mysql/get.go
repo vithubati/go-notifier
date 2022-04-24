@@ -9,7 +9,7 @@ import (
 // getDeliverers - retrieves the list of Deliverers for the given type
 func getDeliverers(ctx context.Context, db *sql.DB, dType string) ([]model.Deliverer, error) {
 	const (
-		queryDeliverers = "SELECT id, type, url, credentials, createdAt, retry, intervalInSeconds FROM deliverer WHERE type = ? ORDER BY createdAt ASC"
+		queryDeliverers = "SELECT id, type, url, headers, credentials, createdAt, retry, intervalInSeconds FROM deliverer WHERE type = ? ORDER BY createdAt ASC"
 	)
 
 	deliveries := make([]model.Deliverer, 0, 0)
@@ -20,7 +20,7 @@ func getDeliverers(ctx context.Context, db *sql.DB, dType string) ([]model.Deliv
 	defer rows.Close()
 	for rows.Next() {
 		var d model.Deliverer
-		err := rows.Scan(&d.ID, &d.Type, &d.Url, &d.Credentials, &d.CreatedAt, &d.Retry, &d.Interval)
+		err := rows.Scan(&d.ID, &d.Type, &d.Url, &d.Headers, &d.Credentials, &d.CreatedAt, &d.Retry, &d.IntervalInSeconds)
 		if err != nil {
 			return nil, err
 		}
