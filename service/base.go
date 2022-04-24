@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/remind101/migrate"
 	"github.com/sirupsen/logrus"
+	"github.com/vithubati/go-notifier/config"
 	"github.com/vithubati/go-notifier/delivery"
 	"github.com/vithubati/go-notifier/migrations"
 	"github.com/vithubati/go-notifier/model"
@@ -24,27 +25,26 @@ const (
 
 // service implements a notifier service.
 type service struct {
-	opts  Opts
+	cfg   *config.Config
 	store store.Store
-}
-
-// Opts configures the notifier service
-type Opts struct {
-	DeliveryInterval time.Duration
-	Migrations       bool
-	ConnString       string
-	Client           *http.Client
-	WebhookEnabled   bool
 }
 
 // New creates a New notifier service and kicks off the notification deliveries
 //
 // Canceling the ctx will kill any concurrent routines affiliated with
 // the notifier.
-func New(opts Opts) (*service, error) {
-
+func New(cfg *config.Config) (*service, error) {
+	if err := cfg.Notifier.Validate(); err != nil {
+		return nil, err
+	}
+	if cfg.Trace {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
+	if cfg.JsonLogFormat {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
 	// initialize DB
-	db, err := initDBConn(opts)
+	db, err := initDBConn(cfg.Notifier)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize DB: %v", err)
 	}
@@ -53,13 +53,13 @@ func New(opts Opts) (*service, error) {
 
 	return &service{
 		store: s,
-		opts:  opts,
+		cfg:   cfg,
 	}, nil
 }
 
 func (s *service) CreateDeliverer(ctx context.Context, d model.Deliverer) error {
 	if d.IntervalInSeconds <= 0 {
-		d.IntervalInSeconds = int(s.opts.DeliveryInterval.Seconds())
+		d.IntervalInSeconds = int(s.cfg.Notifier.DeliveryInterval.Seconds())
 	}
 	return s.store.CreateDeliverer(ctx, d)
 }
@@ -75,15 +75,15 @@ func (s *service) KickOff(ctx context.Context) error {
 	}).WithContext(ctx)
 	ctxLog.Info("Kicking Off...")
 	switch {
-	case s.opts.WebhookEnabled:
-		if err := webhookDeliveries(ctx, s.opts, s.store); err != nil {
+	case s.cfg.Notifier.Webhook:
+		if err := webhookDeliveries(ctx, s.cfg.Notifier, s.store); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func initDBConn(opts Opts) (*sql.DB, error) {
+func initDBConn(opts config.Notifier) (*sql.DB, error) {
 	db, err := sql.Open("mysql", opts.ConnString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %v", err)
@@ -103,7 +103,7 @@ func initStore(db *sql.DB) store.Store {
 	return mysql.NewStore(db)
 }
 
-func webhookDeliveries(ctx context.Context, opts Opts, store store.Store) error {
+func webhookDeliveries(ctx context.Context, opts config.Notifier, store store.Store) error {
 	ctxLog := logrus.WithFields(logrus.Fields{
 		"component": "service/service.webhookDeliveries",
 	}).WithContext(ctx)

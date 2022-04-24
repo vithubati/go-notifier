@@ -66,11 +66,11 @@ func (d *Delivery) deliver(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			ctxLog.Infof("delivery tick")
+			ctxLog.Debug("delivery tick")
 			err := d.runDelivery(ctx)
 			if err != nil {
 				ctxLog.WithContext(ctx).
-					WithError(err).Error("encountered error inside runDelivery")
+					WithError(err).Error("encountered an error inside runDelivery")
 			}
 		}
 	}

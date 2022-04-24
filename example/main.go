@@ -19,7 +19,8 @@ func newConfig() *config.Config {
 			DeliveryInterval: 5 * time.Second,
 			Migrations:       true,
 		},
-		Trace: true,
+		Trace: false,
+		JsonLogFormat: true,
 	}
 }
 
@@ -54,14 +55,8 @@ func Notifier(cfg *config.Config) (service.Service, error) {
 		Timeout:   time.Second * 10,
 		Transport: netTransport,
 	}
-
-	s, err := service.New(service.Opts{
-		DeliveryInterval: cfg.Notifier.DeliveryInterval,
-		ConnString:       cfg.Notifier.ConnString,
-		Client:           c,
-		Migrations:       cfg.Notifier.Migrations,
-		WebhookEnabled:   cfg.Notifier.Webhook,
-	})
+	cfg.Notifier.Client = c
+	s, err := service.New(cfg)
 	if err != nil {
 		return nil, err
 	}
