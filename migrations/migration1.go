@@ -7,6 +7,8 @@ const (
 		id 				varchar(36) PRIMARY KEY,
 		resource        VARCHAR(50) NOT NULL,
 		action          VARCHAR(50) NOT NULL,
+		subject         VARCHAR(50) NOT NULL,
+		message         VARCHAR(256) NOT NULL,
 		createdAt       DATETIME,
 		data            TEXT
 	);
@@ -39,5 +41,17 @@ const (
 		createdAt       	DATETIME,
 		updatedAt      		DATETIME
 	);
+
+	ALTER TABLE delivery 
+		ADD CONSTRAINT delivererIdFK
+		  FOREIGN KEY (delivererId)
+		  REFERENCES deliverer (id)
+		  ON DELETE NO ACTION
+		  ON UPDATE NO ACTION,
+		ADD CONSTRAINT notificationIdFK
+		  FOREIGN KEY (notificationId)
+		  REFERENCES notification (id)
+		  ON DELETE NO ACTION
+		  ON UPDATE NO ACTION;
 	`
 )

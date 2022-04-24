@@ -121,6 +121,7 @@ func (d *Delivery) runDelivery(ctx context.Context) error {
 // TODO do's actions should be performed under a distributed lock.
 func (d *Delivery) do(ctx context.Context, n model.Notification) error {
 	ctxLog := logrus.WithFields(logrus.Fields{
+		"delivererId":    d.DelivererID,
 		"notificationId": n.ID,
 		"component":      "delivery/delivery.do",
 	}).WithContext(ctx)
@@ -129,7 +130,7 @@ func (d *Delivery) do(ctx context.Context, n model.Notification) error {
 	if err := d.Deliverer.Deliver(ctx, n); err != nil {
 		// OK for this to fail, notification will stay in Created status.
 		// notifier is failing, lets back off it until next tick.
-		ctxLog.Error("failed to deliver notifications", err)
+		ctxLog.Error("failed to deliver notification: ", err)
 		if err := d.store.Failed(ctx, n.NotificationDeliveryID); err != nil {
 			return err
 		}
