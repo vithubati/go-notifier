@@ -92,7 +92,7 @@ func getDelivererResources(ctx context.Context, db *sql.DB, delivererID string) 
 // createdNotifications retrieves the list of notifications that has delivery status = 'CREATED'
 func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) ([]model.Notification, error) {
 	const (
-		queryNotifications = "SELECT n.id, n.resource, n.action, n.subject, n.message, d.status, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'CREATED' AND d.delivererId = ? ORDER BY d.createdAt ASC"
+		queryNotifications = "SELECT n.id, n.resource, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'CREATED' AND d.delivererId = ? ORDER BY d.createdAt ASC"
 	)
 
 	notifications := make([]model.Notification, 0, 0)
@@ -103,7 +103,7 @@ func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) (
 	defer rows.Close()
 	for rows.Next() {
 		var n model.Notification
-		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
+		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) (
 func failedNotifications(ctx context.Context, db *sql.DB, delivererId string) ([]model.Notification, error) {
 	const (
 		queryDeliverer    = "SELECT retry FROM deliverer where id = ?"
-		queryNotification = "SELECT n.id, n.resource, n.action, n.subject, n.message, d.status, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'FAILED' AND d.delivererId = ? AND d.attempt < ? ORDER BY d.createdAt ASC"
+		queryNotification = "SELECT n.id, n.resource, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'FAILED' AND d.delivererId = ? AND d.attempt < ? ORDER BY d.createdAt ASC"
 	)
 	var retry int
 	if err := db.QueryRowContext(ctx, queryDeliverer, delivererId).Scan(&retry); err != nil && err != sql.ErrNoRows {
@@ -133,7 +133,7 @@ func failedNotifications(ctx context.Context, db *sql.DB, delivererId string) ([
 	defer rows.Close()
 	for rows.Next() {
 		var n model.Notification
-		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
+		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
 		if err != nil {
 			return nil, err
 		}

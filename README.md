@@ -1,6 +1,6 @@
 # Notifier
 
-Notifier is a GO library for sending notifications to external clients using webhooks. 
+Notifier is a GO library for sending notifications to external messaging applications. 
 
 ### To do
 
