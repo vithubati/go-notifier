@@ -9,6 +9,10 @@ Notifier is a GO library for sending notifications to external messaging applica
 
 ### Usage
 
+```shell
+go get -u github.com/vithubati/go-notifier
+```
+
 ```go
 package main
 
