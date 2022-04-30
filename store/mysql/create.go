@@ -71,8 +71,8 @@ func createNotification(ctx context.Context, db *sql.DB, n model.Notification) e
 // these operations occur under a transaction to preserve an atomic operation.
 func createDeliverer(ctx context.Context, db *sql.DB, d model.Deliverer) error {
 	const (
-		insertDeliverer = `INSERT INTO deliverer (id, type, url, headers, credentials, createdAt, retry, intervalInSeconds) 
-VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
+		insertDeliverer = `INSERT INTO deliverer (id, type, url, channelId, headers, credentials, createdAt, retry, intervalInSeconds) 
+VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
 		insertDelivererResource = "INSERT INTO deliverer_resource (deliverer_id, resource) VALUES (?, ?); "
 	)
 	tx, err := db.BeginTx(ctx, nil)
@@ -83,7 +83,7 @@ VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
 
 	// insert into Notification table
 	d.ID = uuid.NewString()
-	rslt, err := tx.ExecContext(ctx, insertDeliverer, uuid.New().String(), d.Type, d.Url, d.Headers, d.Credentials, d.Retry, d.IntervalInSeconds)
+	rslt, err := tx.ExecContext(ctx, insertDeliverer, d.ID, d.Type, d.Url, d.ChannelID, d.Headers, d.Credentials, d.Retry, d.IntervalInSeconds)
 	if err != nil {
 		return err
 	}

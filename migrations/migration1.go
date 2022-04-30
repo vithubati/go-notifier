@@ -16,10 +16,11 @@ const (
 	CREATE TABLE IF NOT EXISTS deliverer
 	(
 		id 					varchar(36) PRIMARY KEY,
-		type        		VARCHAR(50) default NULL,
-		url          		VARCHAR(50) NOT NULL,
+		type        		VARCHAR(50) NOT NULL,
+		url          		VARCHAR(50) default '',
+		channelId          	VARCHAR(50) default '',
 		headers         	VARCHAR(50),
-		credentials     	VARCHAR(50) default "",
+		credentials     	VARCHAR(256) default "",
 		createdAt       	DATETIME,
 		retry       		INT(11),
 		intervalInSeconds   INT(11)

@@ -26,7 +26,11 @@ func New(conf *Config) (delivery.Deliverer, error) {
 	if err := conf.validate(); err != nil {
 		return nil, err
 	}
+
 	client := slack.New(conf.Token)
+	if conf.Client != nil {
+		client = slack.New(conf.Token, slack.OptionHTTPClient(conf.Client))
+	}
 	return &Slack{client: client, channelID: conf.ChannelID}, nil
 }
 

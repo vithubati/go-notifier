@@ -6,4 +6,3 @@ Notifier is a GO library for sending notifications to external messaging applica
 
 * [ ]  Webhook credentials support
 * [ ]  Postgre support
-* [ ]  Slack integration

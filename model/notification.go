@@ -25,6 +25,7 @@ type Deliverer struct {
 	ID                string              `json:"id"`
 	Type              string              `json:"type"`
 	Url               string              `json:"url"`
+	ChannelID         string              `json:"channelId"`
 	Credentials       string              `json:"credentials"`
 	CreatedAt         time.Time           `json:"createdAt"`
 	Retry             int                 `json:"retry"`

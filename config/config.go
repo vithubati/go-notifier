@@ -17,6 +17,8 @@ type Config struct {
 type Notifier struct {
 	// Configures the notifier for webhook delivery
 	Webhook bool
+	// Configures the notifier for slack delivery
+	Slack bool
 	// A Postgres connection string.
 	//
 	// Formats:
@@ -36,7 +38,9 @@ type Notifier struct {
 	//
 	// Whether Notifier nodes handle migrations to their database.
 	Migrations bool
-	Client     *http.Client
+
+	// Client [Optional] provide a custom http client to use for sending notifications.
+	Client *http.Client
 }
 
 func (n *Notifier) Validate() error {

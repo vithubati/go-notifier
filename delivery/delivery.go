@@ -41,7 +41,6 @@ func (d *Delivery) Deliver(ctx context.Context) {
 		"component":   "delivery/delivery.Deliver",
 	}).WithContext(ctx)
 
-	ctxLog.Info("delivering notifications")
 	go func() {
 		err := d.deliver(ctx)
 		if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/vithubati/go-notifier/delivery"
 	"github.com/vithubati/go-notifier/migrations"
 	"github.com/vithubati/go-notifier/model"
+	"github.com/vithubati/go-notifier/slack"
 	"github.com/vithubati/go-notifier/store"
 	"github.com/vithubati/go-notifier/store/mysql"
 	"github.com/vithubati/go-notifier/webhook"
@@ -21,6 +22,7 @@ import (
 
 const (
 	Webhook = "WEBHOOK"
+	Slack   = "SLACK"
 )
 
 // service implements a notifier service.
@@ -74,9 +76,13 @@ func (s *service) KickOff(ctx context.Context) error {
 		"component": "service/service.Deliver",
 	}).WithContext(ctx)
 	ctxLog.Info("Kicking Off...")
-	switch {
-	case s.cfg.Notifier.Webhook:
+	if s.cfg.Notifier.Webhook {
 		if err := webhookDeliveries(ctx, s.cfg.Notifier, s.store); err != nil {
+			return err
+		}
+	}
+	if s.cfg.Notifier.Slack {
+		if err := slackDeliveries(ctx, s.cfg.Notifier, s.store); err != nil {
 			return err
 		}
 	}
@@ -122,6 +128,36 @@ func webhookDeliveries(ctx context.Context, opts config.Notifier, store store.St
 		wh, err := webhook.New(conf)
 		if err != nil {
 			return fmt.Errorf("failed to create webhook deliverer: %v", err)
+		}
+		delivry := delivery.NewDelivery(d.ID, wh, time.Duration(d.IntervalInSeconds)*time.Second, store)
+		ds = append(ds, delivry)
+	}
+	for _, d := range ds {
+		// fixme create new context so the deliverer can be canceled when required
+		d.Deliver(ctx)
+	}
+	return nil
+}
+
+func slackDeliveries(ctx context.Context, opts config.Notifier, store store.Store) error {
+	ctxLog := logrus.WithFields(logrus.Fields{
+		"component": "service/service.slackDeliveries",
+	}).WithContext(ctx)
+	ctxLog.Infof("initiating slack deliverers")
+	deliverers, err := store.GetDeliverer(ctx, Slack)
+	if err != nil {
+		return fmt.Errorf("failed to get Delivery: %v", err)
+	}
+	ds := make([]*delivery.Delivery, 0, len(deliverers))
+	for _, d := range deliverers {
+		conf := &slack.Config{
+			Token:     d.Credentials,
+			ChannelID: d.ChannelID,
+			Client:    opts.Client,
+		}
+		wh, err := slack.New(conf)
+		if err != nil {
+			return fmt.Errorf("failed to create slack deliverer: %v", err)
 		}
 		delivry := delivery.NewDelivery(d.ID, wh, time.Duration(d.IntervalInSeconds)*time.Second, store)
 		ds = append(ds, delivry)

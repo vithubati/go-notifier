@@ -15,11 +15,12 @@ func newConfig() *config.Config {
 	return &config.Config{
 		Notifier: config.Notifier{
 			Webhook:          true,
+			Slack:            true,
 			ConnString:       "root:password@/notifier?parseTime=true",
 			DeliveryInterval: 5 * time.Second,
 			Migrations:       true,
 		},
-		Trace: false,
+		Trace:         false,
 		JsonLogFormat: true,
 	}
 }
