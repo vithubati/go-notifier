@@ -67,7 +67,7 @@ func newConfig() *config.Config {
 		Notifier: config.Notifier{
 			Webhook:          true,
 			Slack:            true,
-			ConnString:       "root:password@/notifier?parseTime=true",
+			ConnString:       "<usernam>>:<password>@/notifier?parseTime=true",
 			DeliveryInterval: 5 * time.Second,
 			Migrations:       true,
 		},
