@@ -69,7 +69,7 @@ func (s *Slack) Deliver(ctx context.Context, notification model.Notification) er
 		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
-		return fmt.Errorf("slack post message was nit successful: %s", err.Error())
+		return fmt.Errorf("slack post message was not successful: %s", err.Error())
 	}
 	ctxLog.Infof("Message successfully sent to channel %s at %s", channelID, timestamp)
 	return nil
