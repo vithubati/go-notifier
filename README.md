@@ -23,20 +23,6 @@ import (
 	"time"
 )
 
-func newConfig() *config.Config {
-	return &config.Config{
-		Notifier: config.Notifier{
-			Webhook:          true,
-			Slack:            true,
-			ConnString:       "root:password@/notifier?parseTime=true",
-			DeliveryInterval: 5 * time.Second,
-			Migrations:       true,
-		},
-		Trace:         false,
-		JsonLogFormat: true,
-	}
-}
-
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -74,6 +60,20 @@ func Notifier(cfg *config.Config) (service.Service, error) {
 		return nil, err
 	}
 	return s, nil
+}
+
+func newConfig() *config.Config {
+	return &config.Config{
+		Notifier: config.Notifier{
+			Webhook:          true,
+			Slack:            true,
+			ConnString:       "root:password@/notifier?parseTime=true",
+			DeliveryInterval: 5 * time.Second,
+			Migrations:       true,
+		},
+		Trace:         false,
+		JsonLogFormat: true,
+	}
 }
 
 ````
