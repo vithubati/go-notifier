@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"github.com/stretchr/testify/assert"
 	"github.com/vithubati/go-notifier/config"
 	"github.com/vithubati/go-notifier/model"
@@ -10,13 +11,16 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	nService, err := New(&config.Config{
+	db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+	assert.Nil(t, err)
+	assert.NotNil(t, db)
+	defer db.Close()
+
+	nService, err := New(db, &config.Config{
 		Notifier: config.Notifier{
 			Webhook:          true,
 			Slack:            true,
-			ConnString:       "root:password@/notifier?parseTime=true",
 			DeliveryInterval: 5 * time.Second,
-			Migrations:       true,
 		},
 		Trace:         false,
 		JsonLogFormat: true,
@@ -26,13 +30,16 @@ func TestNew(t *testing.T) {
 }
 
 func TestCreateNotification(t *testing.T) {
-	nService, err := New(&config.Config{
+	db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+	assert.Nil(t, err)
+	assert.NotNil(t, db)
+	defer db.Close()
+
+	nService, err := New(db, &config.Config{
 		Notifier: config.Notifier{
 			Webhook:          true,
 			Slack:            true,
-			ConnString:       "root:password@/notifier?parseTime=true",
 			DeliveryInterval: 5 * time.Second,
-			Migrations:       true,
 		},
 		Trace:         false,
 		JsonLogFormat: true,
@@ -50,13 +57,16 @@ func TestCreateNotification(t *testing.T) {
 	assert.Nil(t, err)
 }
 func TestCreateDeliverer(t *testing.T) {
-	nService, err := New(&config.Config{
+	db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+	assert.Nil(t, err)
+	assert.NotNil(t, db)
+	defer db.Close()
+
+	nService, err := New(db, &config.Config{
 		Notifier: config.Notifier{
 			Webhook:          true,
 			Slack:            true,
-			ConnString:       "root:password@/notifier?parseTime=true",
 			DeliveryInterval: 5 * time.Second,
-			Migrations:       true,
 		},
 		Trace:         false,
 		JsonLogFormat: true,

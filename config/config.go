@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"net/http"
 	"time"
 )
@@ -19,13 +18,6 @@ type Notifier struct {
 	Webhook bool
 	// Configures the notifier for slack delivery
 	Slack bool
-	// A Postgres connection string.
-	//
-	// Formats:
-	// url: "postgres://pqgotest:password@localhost/pqgotest?sslmode=verify-full"
-	// or
-	// string: "user=pqgotest dbname=pqgotest sslmode=verify-full"
-	ConnString string
 	// A time.ParseDuration parsable string
 	//
 	// The frequency at which the notifier attempt delivery of created or previously failed
@@ -46,9 +38,6 @@ type Notifier struct {
 func (n *Notifier) Validate() error {
 	if n.DeliveryInterval < 1*time.Second {
 		n.DeliveryInterval = DefaultNotifierDeliveryInterval
-	}
-	if len(n.ConnString) == 0 {
-		return errors.New("database connection url is required")
 	}
 	return nil
 }

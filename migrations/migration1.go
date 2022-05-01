@@ -9,7 +9,7 @@ const (
 		action          VARCHAR(50) NOT NULL,
 		subject         VARCHAR(50) NOT NULL,
 		message         VARCHAR(256) NOT NULL,
-		createdAt       DATETIME,
+		createdAt       DATETIME DEFAULT NULL,
 		data            TEXT
 	);
 
@@ -20,7 +20,7 @@ const (
 		url          		VARCHAR(50) default '',
 		channelId          	VARCHAR(50) default '',
 		headers         	VARCHAR(50),
-		credentials     	VARCHAR(256) default "",
+		credentials     	VARCHAR(256) default '',
 		createdAt       	DATETIME,
 		retry       		INT(11),
 		intervalInSeconds   INT(11)

@@ -13,5 +13,8 @@ var Migrations = []migrate.Migration{
 			_, err := tx.Exec(migration1)
 			return err
 		},
+		Down: func(tx *sql.Tx) error {
+			return nil
+		},
 	},
 }

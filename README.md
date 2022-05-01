@@ -14,7 +14,7 @@ event occurs on a topic in an application, if you want that event to be sent as 
 go get -u github.com/vithubati/go-notifier
 ```
 
-## inserting notification
+## Inserting notification
 
 ```go
 nService, err := New(&config.Config{
@@ -42,7 +42,7 @@ if err := nService.CreateNotification(context.Background(), n); err != nil {
 }
 ```
 
-## inserting deliverer (Slack/Webhook)
+## Inserting deliverer (Slack/Webhook)
 
 ```go
 nService, err := New(&config.Config{
@@ -74,13 +74,14 @@ if err := nService.CreateDeliverer(context.Background(), d); err != nil {
 }
 ```
 
-## initiating the Notifier service worker
+## Initiating the Notifier service worker
 
 ```go
 package main
 
 import (
 	"context"
+	"database/sql"
 	"github.com/vithubati/go-notifier/config"
 	"github.com/vithubati/go-notifier/service"
 	"log"
@@ -96,13 +97,21 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		s, err := Notifier(newConfig())
+		db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+		if err != nil {
+			log.Fatalf("failed to open db error = %v", err)
+			return
+		}
+		defer db.Close()
+		cfg := newConfig()
+		cfg.Notifier.Client = httpClient()
+		s, err := service.New(db, cfg)
 		if err != nil {
 			log.Fatalf("Notifier() error = %v", err)
 			return
 		}
 		if err := s.KickOff(ctx); err != nil {
-			log.Fatalf("Notifier() error = %v", err)
+			log.Fatalf("Notifier() KickOff error = %v", err)
 			return
 		}
 		return
@@ -110,36 +119,29 @@ func main() {
 	wg.Wait()
 }
 
-func Notifier(cfg *config.Config) (service.Service, error) {
+func newConfig() *config.Config {
+	return &config.Config{
+		Notifier: config.Notifier{
+			Webhook:          true,
+			Slack:            true,
+			DeliveryInterval: 5 * time.Second,
+			Migrations:       true,
+		},
+		Trace:         false,
+		JsonLogFormat: true,
+	}
+}
+
+func httpClient() *http.Client {
 	var netTransport = &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout: 5 * time.Second,
 		}).DialContext,
 		TLSHandshakeTimeout: 5 * time.Second,
 	}
-	c := &http.Client{
+	return &http.Client{
 		Timeout:   time.Second * 10,
 		Transport: netTransport,
-	}
-	cfg.Notifier.Client = c
-	s, err := service.New(cfg)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
-}
-
-func newConfig() *config.Config {
-	return &config.Config{
-		Notifier: config.Notifier{
-			Webhook:          true,
-			Slack:            true,
-			ConnString:       "<usernam>>:<password>@/notifier?parseTime=true",
-			DeliveryInterval: 5 * time.Second,
-			Migrations:       true,
-		},
-		Trace:         false,
-		JsonLogFormat: true,
 	}
 }
 

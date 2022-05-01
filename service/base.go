@@ -35,7 +35,7 @@ type service struct {
 //
 // Canceling the ctx will kill any concurrent routines affiliated with
 // the notifier.
-func New(cfg *config.Config) (Service, error) {
+func New(db *sql.DB, cfg *config.Config) (Service, error) {
 	if err := cfg.Notifier.Validate(); err != nil {
 		return nil, err
 	}
@@ -45,10 +45,11 @@ func New(cfg *config.Config) (Service, error) {
 	if cfg.JsonLogFormat {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
-	// initialize DB
-	db, err := initDBConn(cfg.Notifier)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize DB: %v", err)
+	// do migrations if requested
+	if cfg.Notifier.Migrations {
+		if err := migrateDB(db); err != nil {
+			return nil, fmt.Errorf("failed to initialize DB: %v", err)
+		}
 	}
 	// initialize store
 	s := initStore(db)
@@ -89,20 +90,12 @@ func (s *service) KickOff(ctx context.Context) error {
 	return nil
 }
 
-func initDBConn(opts config.Notifier) (*sql.DB, error) {
-	db, err := sql.Open("mysql", opts.ConnString)
+func migrateDB(db *sql.DB) error {
+	err := migrate.Exec(db, migrate.Up, migrations.Migrations...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open db: %v", err)
+		return fmt.Errorf("failed to perform migrations: %w", err)
 	}
-
-	// do migrations if requested
-	if opts.Migrations {
-		err := migrate.Exec(db, migrate.Up, migrations.Migrations...)
-		if err != nil {
-			return nil, fmt.Errorf("failed to perform migrations: %w", err)
-		}
-	}
-	return db, nil
+	return nil
 }
 
 func initStore(db *sql.DB) store.Store {
