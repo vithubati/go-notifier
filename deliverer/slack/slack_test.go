@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const token = "xoxb-1336502280788-3459693313171-s9dcsGWsZyEOoxIaiM8ADWz7"
+const token = "xoxb-1336502280788-3459693313171-BSG5b6UoN5qlz7wRFSH7J2qB"
 
 func TestDeliver(t *testing.T) {
 	if token == "" {
