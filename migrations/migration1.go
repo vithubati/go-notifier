@@ -54,5 +54,14 @@ const (
 		  REFERENCES notification (id)
 		  ON DELETE NO ACTION
 		  ON UPDATE NO ACTION;
+
+	ALTER TABLE deliverer_topic
+		ADD INDEX delevererFK_idx (deliverer_id ASC);
+		ALTER TABLE deliverer_topic 
+		ADD CONSTRAINT delevererFK
+		  FOREIGN KEY (deliverer_id)
+		  REFERENCES deliverer (id)
+		  ON DELETE CASCADE
+		  ON UPDATE NO ACTION;
 	`
 )

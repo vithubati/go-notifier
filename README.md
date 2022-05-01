@@ -1,11 +1,12 @@
 # Notifier
 
-Notifier is a GO library for sending notifications to external messaging applications.
+Notifier is a GO library for sending notifications to external messaging applications on demand. For example, when an
+event occurs on a topic in an application, if you want that event to be sent as a notification to external services
+(such as slack or webhooks) which have subscribed to, this library will take care of it.
 
-### To do
+### Model
 
-* [ ]  Webhook credentials support
-* [ ]  Postgre support
+<img alt="db_model.png" height="350" src="./assets/db_model.png" width="400"/>
 
 ### Usage
 
@@ -81,3 +82,8 @@ func newConfig() *config.Config {
 }
 
 ````
+
+### To do
+
+* [ ]  Webhook credentials support
+* [ ]  Postgre support
