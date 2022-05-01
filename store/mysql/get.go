@@ -24,11 +24,11 @@ func getDeliverers(ctx context.Context, db *sql.DB, dType string) ([]model.Deliv
 		if err != nil {
 			return nil, err
 		}
-		res, err := getDelivererResources(ctx, db, d.ID)
+		res, err := getDelivererTopics(ctx, db, d.ID)
 		if err != nil {
 			return nil, err
 		}
-		d.Resources = res
+		d.Topics = res
 		deliveries = append(deliveries, d)
 	}
 	if err := rows.Err(); err != nil {
@@ -37,14 +37,14 @@ func getDeliverers(ctx context.Context, db *sql.DB, dType string) ([]model.Deliv
 	return deliveries, nil
 }
 
-// getDelivererIDsByResource - retrieves the list of Deliverers' IDs by a resource
-func getDelivererIDsByResource(ctx context.Context, db *sql.DB, resource string) ([]string, error) {
+// getDelivererIDsByTopic - retrieves the list of Deliverers' IDs by a topic
+func getDelivererIDsByTopic(ctx context.Context, db *sql.DB, topic string) ([]string, error) {
 	const (
-		queryDelivererResources = "SELECT DISTINCT deliverer_id FROM deliverer_resource where resource = ?"
+		queryDelivererTopics = "SELECT DISTINCT deliverer_id FROM deliverer_topic where topic = ?"
 	)
 
 	ids := make([]string, 0, 0)
-	rows, err := db.QueryContext(ctx, queryDelivererResources, resource)
+	rows, err := db.QueryContext(ctx, queryDelivererTopics, topic)
 	if err != nil {
 		return nil, err
 	}
@@ -63,36 +63,36 @@ func getDelivererIDsByResource(ctx context.Context, db *sql.DB, resource string)
 	return ids, nil
 }
 
-// getDelivererResources -  retrieves the list of Deliverers' resources for the given deliverer id
-func getDelivererResources(ctx context.Context, db *sql.DB, delivererID string) ([]model.DelivererResource, error) {
+// getDelivererTopics -  retrieves the list of Deliverers' topics for the given deliverer id
+func getDelivererTopics(ctx context.Context, db *sql.DB, delivererID string) ([]model.DelivererTopic, error) {
 	const (
-		queryDelivererResources = "SELECT deliverer_id, resource FROM deliverer_resource where deliverer_id = ?"
+		queryDelivererTopics = "SELECT deliverer_id, topic FROM deliverer_topic where deliverer_id = ?"
 	)
 
-	resources := make([]model.DelivererResource, 0, 0)
-	rows, err := db.QueryContext(ctx, queryDelivererResources, delivererID)
+	topics := make([]model.DelivererTopic, 0, 0)
+	rows, err := db.QueryContext(ctx, queryDelivererTopics, delivererID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var r model.DelivererResource
-		err := rows.Scan(&r.DelivererID, &r.Resource)
+		var r model.DelivererTopic
+		err := rows.Scan(&r.DelivererID, &r.Topic)
 		if err != nil {
 			return nil, err
 		}
-		resources = append(resources, r)
+		topics = append(topics, r)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return resources, nil
+	return topics, nil
 }
 
 // createdNotifications retrieves the list of notifications that has delivery status = 'CREATED'
 func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) ([]model.Notification, error) {
 	const (
-		queryNotifications = "SELECT n.id, n.resource, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'CREATED' AND d.delivererId = ? ORDER BY d.createdAt ASC"
+		queryNotifications = "SELECT n.id, n.topic, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'CREATED' AND d.delivererId = ? ORDER BY d.createdAt ASC"
 	)
 
 	notifications := make([]model.Notification, 0, 0)
@@ -103,7 +103,7 @@ func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) (
 	defer rows.Close()
 	for rows.Next() {
 		var n model.Notification
-		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
+		err := rows.Scan(&n.ID, &n.Topic, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func createdNotifications(ctx context.Context, db *sql.DB, delivererId string) (
 func failedNotifications(ctx context.Context, db *sql.DB, delivererId string) ([]model.Notification, error) {
 	const (
 		queryDeliverer    = "SELECT retry FROM deliverer where id = ?"
-		queryNotification = "SELECT n.id, n.resource, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'FAILED' AND d.delivererId = ? AND d.attempt < ? ORDER BY d.createdAt ASC"
+		queryNotification = "SELECT n.id, n.topic, n.action, n.subject, n.message, n.createdAt, n.data, d.id FROM notification n, delivery d WHERE n.id = d.notificationId AND d.status = 'FAILED' AND d.delivererId = ? AND d.attempt < ? ORDER BY d.createdAt ASC"
 	)
 	var retry int
 	if err := db.QueryRowContext(ctx, queryDeliverer, delivererId).Scan(&retry); err != nil && err != sql.ErrNoRows {
@@ -133,7 +133,7 @@ func failedNotifications(ctx context.Context, db *sql.DB, delivererId string) ([
 	defer rows.Close()
 	for rows.Next() {
 		var n model.Notification
-		err := rows.Scan(&n.ID, &n.Resource, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
+		err := rows.Scan(&n.ID, &n.Topic, &n.Action, &n.Subject, &n.Message, &n.CreatedAt, &n.Data, &n.NotificationDeliveryID)
 		if err != nil {
 			return nil, err
 		}

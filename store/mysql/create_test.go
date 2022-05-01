@@ -15,7 +15,7 @@ func Test_createNotification(t *testing.T) {
 	assert.Nil(t, err)
 	ctx := context.Background()
 	n := model.Notification{
-		Resource: "SERVER",
+		Topic: "SERVER",
 		Action:   "CREATE",
 		Subject:  "SERVER Created",
 		Message:  "Server is created for the accountId G445",
@@ -35,7 +35,7 @@ func Test_createDeliverer(t *testing.T) {
 		Url:               "https://www.stackoverflow.com/ttest",
 		Retry:             3,
 		IntervalInSeconds: 10,
-		Resources:         []model.DelivererResource{{Resource: "SERVER"}},
+		Topics:         []model.DelivererTopic{{Topic: "SERVER"}},
 	}
 	headers := make(map[string][]string)
 	headers["X-Request-id"] = []string{"456456"}
@@ -55,7 +55,7 @@ func Test_createDeliverer2(t *testing.T) {
 		Credentials:       "xoxb-1336502280788-3459693313171-cP9Kc3UQ93gfDiBThv5ubNvK",
 		Retry:             3,
 		IntervalInSeconds: 10,
-		Resources:         []model.DelivererResource{{Resource: "SERVER"}},
+		Topics:         []model.DelivererTopic{{Topic: "SERVER"}},
 	}
 	err = createDeliverer(ctx, db, d)
 	assert.Nil(t, err)

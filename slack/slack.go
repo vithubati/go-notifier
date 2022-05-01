@@ -47,8 +47,8 @@ func (s *Slack) Deliver(ctx context.Context, notification model.Notification) er
 		Pretext: notification.Message,
 		Fields: []slack.AttachmentField{
 			{
-				Title: "Resource",
-				Value: notification.Resource,
+				Title: "Topic",
+				Value: notification.Topic,
 			},
 			{
 				Title: "Action",

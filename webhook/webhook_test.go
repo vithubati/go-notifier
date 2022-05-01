@@ -55,7 +55,7 @@ func TestDeliver(t *testing.T) {
 	}
 	n := model.Notification{
 		ID:                     "",
-		Resource:               "",
+		Topic:               "",
 		Action:                 "",
 		NotificationDeliveryID: "",
 		CreatedAt:              time.Time{},

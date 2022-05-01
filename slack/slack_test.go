@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const token = ""
+const token = "xoxb-1336502280788-3459693313171-s9dcsGWsZyEOoxIaiM8ADWz7"
 
 func TestDeliver(t *testing.T) {
 	if token == "" {
@@ -24,7 +24,7 @@ func TestDeliver(t *testing.T) {
 	}
 	tme, _ := time.Parse(time.RFC3339, "2022-04-18 02:58:41")
 	n := model.Notification{
-		Resource:               "VPC",
+		Topic:               "VPC",
 		Action:                 "UPDATED",
 		Subject:                "VPC Updated",
 		Message:                "Vpc is updated for the accountId 3290",

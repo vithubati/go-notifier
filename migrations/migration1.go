@@ -5,7 +5,7 @@ const (
 	CREATE TABLE IF NOT EXISTS notification
 	(
 		id 				varchar(36) PRIMARY KEY,
-		resource        VARCHAR(50) NOT NULL,
+		topic           VARCHAR(50) NOT NULL,
 		action          VARCHAR(50) NOT NULL,
 		subject         VARCHAR(50) NOT NULL,
 		message         VARCHAR(256) NOT NULL,
@@ -26,10 +26,10 @@ const (
 		intervalInSeconds   INT(11)
 	);
 
-	CREATE TABLE IF NOT EXISTS deliverer_resource
+	CREATE TABLE IF NOT EXISTS deliverer_topic
 	(
 		deliverer_id 		varchar(36) NOT NULL,
-		resource 			varchar(36) NOT NULL
+		topic 			varchar(36) NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS delivery

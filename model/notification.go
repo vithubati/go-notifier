@@ -9,10 +9,10 @@ import (
 )
 
 // Notification abstracts details of a change
-// made on a specific resource
+// made on a specific Topic
 type Notification struct {
 	ID                     string      `json:"id"`
-	Resource               string      `json:"resource"`
+	Topic                  string      `json:"topic"`
 	Action                 string      `json:"action"`
 	Subject                string      `json:"subject"`
 	Message                string      `json:"message"`
@@ -22,16 +22,16 @@ type Notification struct {
 }
 
 type Deliverer struct {
-	ID                string              `json:"id"`
-	Type              string              `json:"type"`
-	Url               string              `json:"url"`
-	ChannelID         string              `json:"channelId"`
-	Credentials       string              `json:"credentials"`
-	CreatedAt         time.Time           `json:"createdAt"`
-	Retry             int                 `json:"retry"`
-	IntervalInSeconds int                 `json:"IntervalInSeconds"`
-	Headers           Headers             `json:"headers"`
-	Resources         []DelivererResource `json:"resources"`
+	ID                string           `json:"id"`
+	Type              string           `json:"type"`
+	Url               string           `json:"url"`
+	ChannelID         string           `json:"channelId"`
+	Credentials       string           `json:"credentials"`
+	CreatedAt         time.Time        `json:"createdAt"`
+	Retry             int              `json:"retry"`
+	IntervalInSeconds int              `json:"IntervalInSeconds"`
+	Headers           Headers          `json:"headers"`
+	Topics            []DelivererTopic `json:"topics"`
 }
 
 type Headers map[string][]string
@@ -63,9 +63,9 @@ func (h Headers) Value() (driver.Value, error) {
 	return driver.Value(raw), nil
 }
 
-type DelivererResource struct {
+type DelivererTopic struct {
 	DelivererID string `json:"delivererId"`
-	Resource    string `json:"resource"`
+	Topic       string `json:"topic"`
 }
 
 type Delivery struct {

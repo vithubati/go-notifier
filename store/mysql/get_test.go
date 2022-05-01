@@ -28,22 +28,22 @@ func Test_getDeliverer(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
-func Test_getDelivererIDsByResource(t *testing.T) {
+func Test_getDelivererIDsByTopic(t *testing.T) {
 	db, err := initDBConn()
 	defer db.Close()
 	assert.Nil(t, err)
 	ctx := context.Background()
-	res, err := getDelivererIDsByResource(ctx, db, "VPC")
+	res, err := getDelivererIDsByTopic(ctx, db, "VPC")
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
 }
 
-func Test_getDelivererResources(t *testing.T) {
+func Test_getDelivererTopics(t *testing.T) {
 	db, err := initDBConn()
 	defer db.Close()
 	assert.Nil(t, err)
 	ctx := context.Background()
-	res, err := getDelivererResources(ctx, db, "111")
+	res, err := getDelivererTopics(ctx, db, "111")
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
 }

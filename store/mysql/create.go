@@ -16,10 +16,10 @@ import (
 // these operations occur under a transaction to preserve an atomic operation.
 func createNotification(ctx context.Context, db *sql.DB, n model.Notification) error {
 	const (
-		insertNotification = `INSERT INTO notification (id, action, resource, subject, message, createdAt, data) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?);`
+		insertNotification = `INSERT INTO notification (id, action, topic, subject, message, createdAt, data) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?);`
 		insertDelivery     = `INSERT INTO delivery (id, notificationId, delivererId, status, createdAt, updatedAt) VALUES (?, ?, ?, 'CREATED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
 	)
-	deliverers, err := getDelivererIDsByResource(ctx, db, n.Resource)
+	deliverers, err := getDelivererIDsByTopic(ctx, db, n.Topic)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func createNotification(ctx context.Context, db *sql.DB, n model.Notification) e
 	defer tx.Rollback()
 
 	// insert into Notification table
-	rslt, err := tx.ExecContext(ctx, insertNotification, n.ID, n.Action, n.Resource, n.Subject, n.Message, n.Data)
+	rslt, err := tx.ExecContext(ctx, insertNotification, n.ID, n.Action, n.Topic, n.Subject, n.Message, n.Data)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func createDeliverer(ctx context.Context, db *sql.DB, d model.Deliverer) error {
 	const (
 		insertDeliverer = `INSERT INTO deliverer (id, type, url, channelId, headers, credentials, createdAt, retry, intervalInSeconds) 
 VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
-		insertDelivererResource = "INSERT INTO deliverer_resource (deliverer_id, resource) VALUES (?, ?); "
+		insertDelivererTopic = "INSERT INTO deliverer_topic (deliverer_id, topic) VALUES (?, ?); "
 	)
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
@@ -95,18 +95,18 @@ VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?);`
 		return fmt.Errorf("no rows affected when inserting Deliverer")
 	}
 
-	// insert into deliverer resource
-	for _, res := range d.Resources {
-		rslt, err = tx.ExecContext(ctx, insertDelivererResource, d.ID, res.Resource)
+	// insert into deliverer topic
+	for _, res := range d.Topics {
+		rslt, err = tx.ExecContext(ctx, insertDelivererTopic, d.ID, res.Topic)
 		if err != nil {
 			return err
 		}
 		r, err = rslt.RowsAffected()
 		if err != nil {
-			return errors.New(fmt.Sprintf("when inserting Deliverer resource, %s", err.Error()))
+			return errors.New(fmt.Sprintf("when inserting Deliverer topic, %s", err.Error()))
 		}
 		if r <= 0 {
-			return fmt.Errorf("no rows affected when inserting Deliverer resource")
+			return fmt.Errorf("no rows affected when inserting Deliverer topic")
 		}
 	}
 
