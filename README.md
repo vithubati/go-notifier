@@ -17,7 +17,12 @@ go get -u github.com/vithubati/go-notifier
 ## Inserting notification
 
 ```go
-nService, err := New(&config.Config{
+db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+if err != nil {
+    log.Fatalln(err)
+}
+defer db.Close()
+nService, err := New(db, &config.Config{
     Notifier: config.Notifier{
         Webhook:          true,
         Slack:            true,
@@ -45,7 +50,13 @@ if err := nService.CreateNotification(context.Background(), n); err != nil {
 ## Inserting deliverer (Slack/Webhook)
 
 ```go
-nService, err := New(&config.Config{
+db, err := sql.Open("mysql", "root:password@/notifier?parseTime=true")
+if err != nil {
+    log.Fatalln(err)
+}
+defer db.Close()
+
+nService, err := New(db, &config.Config{
     Notifier: config.Notifier{
         Webhook:          true,
         Slack:            true,
