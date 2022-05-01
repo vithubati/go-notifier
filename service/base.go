@@ -35,7 +35,7 @@ type service struct {
 //
 // Canceling the ctx will kill any concurrent routines affiliated with
 // the notifier.
-func New(cfg *config.Config) (*service, error) {
+func New(cfg *config.Config) (Service, error) {
 	if err := cfg.Notifier.Validate(); err != nil {
 		return nil, err
 	}
@@ -59,15 +59,15 @@ func New(cfg *config.Config) (*service, error) {
 	}, nil
 }
 
+func (s *service) CreateNotification(ctx context.Context, n model.Notification) error {
+	return s.store.Create(ctx, n)
+}
+
 func (s *service) CreateDeliverer(ctx context.Context, d model.Deliverer) error {
 	if d.IntervalInSeconds <= 0 {
 		d.IntervalInSeconds = int(s.cfg.Notifier.DeliveryInterval.Seconds())
 	}
 	return s.store.CreateDeliverer(ctx, d)
-}
-
-func (s *service) CreateNotification(ctx context.Context, n model.Notification) error {
-	return s.store.Create(ctx, n)
 }
 
 // KickOff - kick off configured deliverer type

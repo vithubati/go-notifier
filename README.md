@@ -14,6 +14,68 @@ event occurs on a topic in an application, if you want that event to be sent as 
 go get -u github.com/vithubati/go-notifier
 ```
 
+## inserting notification
+
+```go
+nService, err := New(&config.Config{
+    Notifier: config.Notifier{
+        Webhook:          true,
+        Slack:            true,
+        ConnString:       "root:password@/notifier?parseTime=true",
+        DeliveryInterval: 5 * time.Second,
+        Migrations:       true,
+    },
+    Trace:         false,
+    JsonLogFormat: true,
+})
+if err != nil {
+    log.Fatalln(err)
+}
+n := model.Notification{
+    Topic:   "SERVER",
+    Action:  "CREATE",
+    Subject: "SERVER Created",
+    Message: "Server is created for the accountId G445",
+}
+if err := nService.CreateNotification(context.Background(), n); err != nil {
+    log.Fatalln(err)
+}
+```
+
+## inserting deliverer (Slack/Webhook)
+
+```go
+nService, err := New(&config.Config{
+    Notifier: config.Notifier{
+        Webhook:          true,
+        Slack:            true,
+        ConnString:       "root:password@/notifier?parseTime=true",
+        DeliveryInterval: 5 * time.Second,
+        Migrations:       true,
+    },
+    Trace:         false,
+    JsonLogFormat: true,
+})
+if err != nil {
+    log.Fatalln(err)
+}
+d := model.Deliverer{
+    Type:              "WEBHOOK",
+    Url:               "https://www.stackoverflow.com/ttest",
+    Retry:             3,
+    IntervalInSeconds: 10,
+    Topics:            []model.DelivererTopic{{Topic: "SERVER"}},
+}
+headers := make(map[string][]string)
+headers["X-Request-id"] = []string{"456456"}
+d.Headers = headers
+if err := nService.CreateDeliverer(context.Background(), d); err != nil {
+    log.Fatalln(err)
+}
+```
+
+## initiating the Notifier service worker
+
 ```go
 package main
 
