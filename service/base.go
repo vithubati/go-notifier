@@ -7,13 +7,13 @@ import (
 	"github.com/remind101/migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/vithubati/go-notifier/config"
+	slack2 "github.com/vithubati/go-notifier/deliverer/slack"
+	webhook2 "github.com/vithubati/go-notifier/deliverer/webhook"
 	"github.com/vithubati/go-notifier/delivery"
 	"github.com/vithubati/go-notifier/migrations"
 	"github.com/vithubati/go-notifier/model"
-	"github.com/vithubati/go-notifier/slack"
 	"github.com/vithubati/go-notifier/store"
 	"github.com/vithubati/go-notifier/store/mysql"
-	"github.com/vithubati/go-notifier/webhook"
 	"net/http"
 	"time"
 
@@ -113,12 +113,12 @@ func webhookDeliveries(ctx context.Context, opts config.Notifier, store store.St
 	}
 	ds := make([]*delivery.Delivery, 0, len(deliverers))
 	for _, d := range deliverers {
-		conf := &webhook.Config{
+		conf := &webhook2.Config{
 			Headers: http.Header(d.Headers),
 			Client:  opts.Client,
 			Target:  d.Url,
 		}
-		wh, err := webhook.New(conf)
+		wh, err := webhook2.New(conf)
 		if err != nil {
 			return fmt.Errorf("failed to create webhook deliverer: %v", err)
 		}
@@ -143,12 +143,12 @@ func slackDeliveries(ctx context.Context, opts config.Notifier, store store.Stor
 	}
 	ds := make([]*delivery.Delivery, 0, len(deliverers))
 	for _, d := range deliverers {
-		conf := &slack.Config{
+		conf := &slack2.Config{
 			Token:     d.Credentials,
 			ChannelID: d.ChannelID,
 			Client:    opts.Client,
 		}
-		wh, err := slack.New(conf)
+		wh, err := slack2.New(conf)
 		if err != nil {
 			return fmt.Errorf("failed to create slack deliverer: %v", err)
 		}
