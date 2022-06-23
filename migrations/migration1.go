@@ -12,7 +12,8 @@ const (
 		createdAt       DATETIME DEFAULT NULL,
 		data            TEXT
 	);
-
+`
+	migration2 = `
 	CREATE TABLE IF NOT EXISTS deliverer
 	(
 		id 					varchar(36) PRIMARY KEY,
@@ -25,13 +26,15 @@ const (
 		retry       		INT(11),
 		intervalInSeconds   INT(11)
 	);
-
+`
+	migration3 = `
 	CREATE TABLE IF NOT EXISTS deliverer_topic
 	(
 		deliverer_id 		varchar(36) NOT NULL,
 		topic 			varchar(36) NOT NULL
 	);
-
+`
+	migration4 = `
 	CREATE TABLE IF NOT EXISTS delivery
 	(
 		id 					varchar(36) PRIMARY KEY,
@@ -42,7 +45,8 @@ const (
 		createdAt       	DATETIME,
 		updatedAt      		DATETIME
 	);
-
+`
+	migration5 = `
 	ALTER TABLE delivery 
 		ADD CONSTRAINT delivererIdFK
 		  FOREIGN KEY (delivererId)
@@ -54,14 +58,17 @@ const (
 		  REFERENCES notification (id)
 		  ON DELETE NO ACTION
 		  ON UPDATE NO ACTION;
-
+`
+	migration6 = `
 	ALTER TABLE deliverer_topic
 		ADD INDEX delevererFK_idx (deliverer_id ASC);
-		ALTER TABLE deliverer_topic 
+`
+	migration7 = `
+	ALTER TABLE deliverer_topic 
 		ADD CONSTRAINT delevererFK
 		  FOREIGN KEY (deliverer_id)
 		  REFERENCES deliverer (id)
 		  ON DELETE CASCADE
 		  ON UPDATE NO ACTION;
-	`
+`
 )
